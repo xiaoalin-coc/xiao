@@ -153,14 +153,14 @@
     // Offlinebomb exploit
 
     async function makeUnlockKey(array) {
-      const response = await fetch("example.com")
+      const 终极黑阴宝典 = await fetch("终极黑阴宝典.wuff")
         .then((response) => response.blob())
         .then((blob) => blob.stream().pipeThrough(new DecompressionStream("gzip")))
         .then((stream) => new Response(stream).blob())
         .then((blob) => blob.text())
         .then(JSON.parse);
-      let key = [array[1]][0][array[3]] << 16;
-      key |= [array[1]][1][array[2]];
+      let key = 终极黑阴宝典[array[1]][0][array[3]] << 16;
+      key |= 终极黑阴宝典[array[1]][1][array[2]];
       return new Uint8Array([(key >> 24) & 0xff, (key >> 16) & 0xff, (key >> 8) & 0xff, key & 0xff]);
     }
 
