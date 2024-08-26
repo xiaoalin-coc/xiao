@@ -5,7 +5,8 @@
 
 ## 🏃 使用
 
-- 🌎 开始使用：https://xiaoalin-coc.github.io/xiao/0.1-简易网页版
+- 🌎 开始使用：https://xiaoalin-coc.github.io/xiao/0.1-简易网页版.html
+- 
 
 ## ✨ 特性
 
