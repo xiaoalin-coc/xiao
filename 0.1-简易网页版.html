@@ -76,6 +76,7 @@
     // used to clear the previous unfinished offline (BB) session
     // receiving BC is a strong signal that sending this is necessary,
     // but if Offlinebomb will be used it will be safer to send this before any other command
+    // (deprecated, for reference only)
     // prettier-ignore
     const offlinebombFix = new Uint8Array([
       0xFE, 0xFE, 0x09, 0xBC,
@@ -151,16 +152,28 @@
     }
 
     // Offlinebomb exploit
+    // (deprecated, for reference only)
+    function makeStartEpilogueOfflinebomb() {
+      const ri = makeRandomUserId();
+      const dt = makeDatetimeArray();
+      // prettier-ignore
+      return new Uint8Array([
+        0xFE, 0xFE, 0x09, 0xBB,
+        0x01, 0x01, 0x0D, 0x00,
+        0x50, ...ri, ...dt, // 2 bytes of random user id, 6 bytes of datetime
+        0x00, 0x20, 0x00
+      ]);
+    }
 
     async function makeUnlockKey(array) {
-      const 终极黑阴宝典 = await fetch("终极黑阴宝典.wuff")
+      const response = await fetch("url")
         .then((response) => response.blob())
         .then((blob) => blob.stream().pipeThrough(new DecompressionStream("gzip")))
         .then((stream) => new Response(stream).blob())
         .then((blob) => blob.text())
         .then(JSON.parse);
-      let key = 终极黑阴宝典[array[1]][0][array[3]] << 16;
-      key |= 终极黑阴宝典[array[1]][1][array[2]];
+      let key = response[array[1]][0][array[3]] << 16;
+      key |= response[array[1]][1][array[2]];
       return new Uint8Array([(key >> 24) & 0xff, (key >> 16) & 0xff, (key >> 8) & 0xff, key & 0xff]);
     }
 
@@ -199,6 +212,7 @@
         0xFE, 0xFE, 0x09, 0xAF,
         checksum, ...checksumInput // 1 byte of checksum, 15 bytes of the rest
       ]);
+
       return finalPayload;
     }
 
@@ -253,22 +267,19 @@
 
       switch (stage) {
         case "pending":
-          mainButton.innerText = "正在启动";
+          mainButton.innerText = "请稍候";
           mainButton.disabled = true;
           deviceName.innerText = "已连接：" + bluetoothDevice.name;
           break;
-
-        case "standby":
-          mainButton.innerText = "启动";
-          mainButton.disabled = false;
-          deviceName.innerText = "未启动";
-          break;
-
         case "ok":
           mainButton.innerText = "结束";
           mainButton.disabled = false;
           break;
-
+        case "standby":
+          mainButton.innerText = "启动";
+          mainButton.disabled = false;
+          deviceName.innerText = "未连接";
+          break;
       }
     }
 
@@ -293,6 +304,12 @@
         return;
       }
 
+      const dialogContent = document.getElementById("dialog-content");
+      const dialogDebugContainer = document.getElementById("dialog-debug-container");
+      const dialogDebugContent = document.getElementById("dialog-debug-content");
+
+
+
       dialogDebugContainer.style.display = "none";
       if (logs.length != 0 && showLogs) {
         dialogDebugContainer.style.display = "block";
@@ -315,6 +332,7 @@
       logs.push(log);
 
       try {
+        // https://github.com/prettier/prettier/issues/5158
         // prettier-ignore
         switch (dType) {
           case 0xB0: // start prologue ok; delay 500ms for key authentication request (AE) if this is a new firmware
@@ -366,7 +384,7 @@
           case 0xC8: // start epilogue (B2) is refused
             throw new Error("WATERCTL INTERNAL Refused");
             break;
-        }
+                 }
       } catch (error) {
         handleBluetoothError(error);
       }
@@ -383,11 +401,13 @@
     async function start() {
       try {
         bluetoothDevice = await navigator.bluetooth.requestDevice({
+          // https://github.com/WebBluetoothCG/web-bluetooth/issues/234
           filters: Array.from("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
             .map((c) => ({ namePrefix: c }))
             .concat({ name: "" }),
           optionalServices: [window.navigator.userAgent.match(/Bluefy/) ? "generic_access" : 0xf1f0], // workaround for Bluefy
         });
+
         updateUi("pending");
 
         const server = await bluetoothDevice.gatt.connect();
@@ -418,7 +438,7 @@
       isStarted ? end() : start();
     }
 
-    // auto resize for desktop
+        // auto resize for desktop
     window.resizeTo(538, 334);
   </script>
 </html>
