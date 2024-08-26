@@ -1,14 +1,15 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="zh-CN">
   <head> 
     <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f8f8f8" />
-        <title>原神1.0</title>
+    <title>0.1-简易网页版</title>
+
     <style>
       body {
         background-color: #f8f8f8;
-    }
+      }
       .main {
         position: absolute;
         left: 50%; 
@@ -18,35 +19,32 @@
         display: flex;
         align-items: center;  
         flex-direction: column;  
-}
+      }
       .unsupported {
         display: none;
       }
-
-       </style>
+    </style>
   </head>
-
 
   <body>
     <div class="main supported"> 
-      <noscript>需要启动原神 JavaScript。</noscript>
-      <button id="main-button" onclick="handleButtonClick()" style="margin: 0%">原神启动</button>
-      <p id="device-name" style="margin-top: 10px; margin-bottom: 10px">未启动原神</p>
+      <noscript>需要启动 JavaScript。</noscript>
+      <button id="main-button" onclick="handleButtonClick()" style="margin: 0%">启动</button>
+      <p id="device-name" style="margin-top: 10px; margin-bottom: 10px">未启动</p>
       <p id="status" style="margin: 0"></p>
     </div>
-
+    <footer>
+      <dialog id="dialog">
+        <header>启动失败</header>
+        <form method="dialog">
+          <p id="dialog-content"></p>
+          <pre id="dialog-debug-container"><code id="dialog-debug-content"></code></pre>
+          <menu style="display: flex; justify-content: flex-end">
+            <button onclick="location.reload()">OK</button>
+          </menu>
+        </form>
+      </dialog>
     </footer>
-
-           <dialog id="dialog">
-      <header>原神启动失败</header>
-      <form method="dialog">
-        <p id="dialog-content"></p>
-        <pre id="dialog-debug-container"><code id="dialog-debug-content"></code></pre>
-        <menu style="display: flex; justify-content: flex-end">
-          <button onclick="location.reload()= false">OK</button>
-        </menu>
-      </form>
-    </dialog>
   </body>
 
   <script>
@@ -78,7 +76,6 @@
     // used to clear the previous unfinished offline (BB) session
     // receiving BC is a strong signal that sending this is necessary,
     // but if Offlinebomb will be used it will be safer to send this before any other command
-    // (deprecated, for reference only)
     // prettier-ignore
     const offlinebombFix = new Uint8Array([
       0xFE, 0xFE, 0x09, 0xBC,
@@ -154,16 +151,16 @@
     }
 
     // Offlinebomb exploit
-       
+
     async function makeUnlockKey(array) {
-      const 终极黑阴宝典 = await fetch("终极黑阴宝典.wuff") 
+      const response = await fetch("example.com")
         .then((response) => response.blob())
         .then((blob) => blob.stream().pipeThrough(new DecompressionStream("gzip")))
         .then((stream) => new Response(stream).blob())
         .then((blob) => blob.text())
         .then(JSON.parse);
-      let key = 终极黑阴宝典[array[1]][0][array[3]] << 16;
-      key |= 终极黑阴宝典[array[1]][1][array[2]];
+      let key = [array[1]][0][array[3]] << 16;
+      key |= [array[1]][1][array[2]];
       return new Uint8Array([(key >> 24) & 0xff, (key >> 16) & 0xff, (key >> 8) & 0xff, key & 0xff]);
     }
 
@@ -256,19 +253,19 @@
 
       switch (stage) {
         case "pending":
-          mainButton.innerText = "正在启动原神";
+          mainButton.innerText = "正在启动";
           mainButton.disabled = true;
           deviceName.innerText = "已连接：" + bluetoothDevice.name;
           break;
 
         case "standby":
-          mainButton.innerText = "原神启动";
+          mainButton.innerText = "启动";
           mainButton.disabled = false;
-          deviceName.innerText = "未启动原神";
+          deviceName.innerText = "未启动";
           break;
 
-       case "ok":
-          mainButton.innerText = "结束原神";
+        case "ok":
+          mainButton.innerText = "结束";
           mainButton.disabled = false;
           break;
 
@@ -295,8 +292,6 @@
         // "2" is a weird behavior of Bluefy browser on iOS
         return;
       }
-
-
 
       dialogDebugContainer.style.display = "none";
       if (logs.length != 0 && showLogs) {
@@ -371,7 +366,7 @@
           case 0xC8: // start epilogue (B2) is refused
             throw new Error("WATERCTL INTERNAL Refused");
             break;
-                 }
+        }
       } catch (error) {
         handleBluetoothError(error);
       }
@@ -385,8 +380,7 @@
       }
     }
 
-    
-async function start() {
+    async function start() {
       try {
         bluetoothDevice = await navigator.bluetooth.requestDevice({
           filters: Array.from("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
