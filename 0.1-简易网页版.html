@@ -48,6 +48,13 @@
   </body>
 
   <script>
+    document.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); // 阻止默认行为
+   }, false);
+    document.addEventListener('keydown', function(e) {
+     e.preventDefault(); // 阻止默认行为
+    }, false);
+
     // send this first, then wait for B0, B1, or AE
     // B0 and B1 contain the status of the previous session, AE is a key authentication request
     // AE will only show up in new firmwares
